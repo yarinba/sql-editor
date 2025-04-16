@@ -14,7 +14,7 @@ interface ResultsTableProps {
 }
 
 const ResultsTable: React.FC<ResultsTableProps> = ({ isLoading }) => {
-  const { results, execution, error, status } = useQuery();
+  const { results, execution, error, status, setPage } = useQuery();
   const [columns, setColumns] = React.useState<ColumnDef<any, any>[]>([]);
 
   // Generate table columns when results change
@@ -186,12 +186,127 @@ const ResultsTable: React.FC<ResultsTableProps> = ({ isLoading }) => {
             Page {results.currentPage} of {results.pageCount}
           </div>
           <div className="flex gap-1">
-            {/* Pagination controls would go here */}
+            {/* Pagination buttons */}
+            <button
+              onClick={() => setPage(1)}
+              disabled={results.currentPage === 1}
+              className={`px-2 py-1 rounded text-sm ${
+                results.currentPage === 1
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                  : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+              }`}
+              aria-label="First page"
+            >
+              &laquo;
+            </button>
+            <button
+              onClick={() => setPage(Math.max(1, results.currentPage - 1))}
+              disabled={results.currentPage === 1}
+              className={`px-2 py-1 rounded text-sm ${
+                results.currentPage === 1
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                  : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+              }`}
+              aria-label="Previous page"
+            >
+              &lsaquo;
+            </button>
+
+            {/* Generate page number buttons */}
+            {generatePaginationButtons(
+              results.currentPage,
+              results.pageCount
+            ).map((page) => (
+              <button
+                key={`page-${page}`}
+                onClick={() => page !== '...' && setPage(Number(page))}
+                className={`px-2 py-1 rounded text-sm ${
+                  page === '...'
+                    ? 'bg-slate-100 text-slate-500 cursor-default'
+                    : page === results.currentPage.toString()
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                }`}
+                disabled={page === '...'}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              onClick={() =>
+                setPage(Math.min(results.pageCount, results.currentPage + 1))
+              }
+              disabled={results.currentPage === results.pageCount}
+              className={`px-2 py-1 rounded text-sm ${
+                results.currentPage === results.pageCount
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                  : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+              }`}
+              aria-label="Next page"
+            >
+              &rsaquo;
+            </button>
+            <button
+              onClick={() => setPage(results.pageCount)}
+              disabled={results.currentPage === results.pageCount}
+              className={`px-2 py-1 rounded text-sm ${
+                results.currentPage === results.pageCount
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                  : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+              }`}
+              aria-label="Last page"
+            >
+              &raquo;
+            </button>
           </div>
         </div>
       )}
     </div>
   );
+};
+
+// Helper function to generate pagination buttons with ellipsis for large page counts
+const generatePaginationButtons = (currentPage: number, totalPages: number) => {
+  // Show at most 7 page buttons at a time (including ellipsis)
+  if (totalPages <= 7) {
+    // If there are 7 or fewer pages, show all page numbers
+    return Array.from({ length: totalPages }, (_, i) => String(i + 1));
+  }
+
+  // Initialize the array of buttons to show
+  const pageButtons: string[] = [];
+
+  // Always show first page
+  pageButtons.push('1');
+
+  // Logic for adding middle pages
+  if (currentPage <= 3) {
+    // If current page is near the start
+    pageButtons.push('2', '3', '4', '5', '...', String(totalPages));
+  } else if (currentPage >= totalPages - 2) {
+    // If current page is near the end
+    pageButtons.push(
+      '...',
+      String(totalPages - 4),
+      String(totalPages - 3),
+      String(totalPages - 2),
+      String(totalPages - 1),
+      String(totalPages)
+    );
+  } else {
+    // If current page is in the middle
+    pageButtons.push(
+      '...',
+      String(currentPage - 1),
+      String(currentPage),
+      String(currentPage + 1),
+      '...',
+      String(totalPages)
+    );
+  }
+
+  return pageButtons;
 };
 
 export default ResultsTable;

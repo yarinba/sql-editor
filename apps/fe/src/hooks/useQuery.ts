@@ -19,6 +19,13 @@ export function useQuery() {
     reset,
   } = useQueryStore();
 
+  // Create a setPage function for pagination
+  const setPage = (page: number) => {
+    if (execution?.queryId) {
+      fetchQueryResults(execution.queryId, page);
+    }
+  };
+
   return {
     // State
     sql,
@@ -37,6 +44,9 @@ export function useQuery() {
     fetchQueryResults,
     downloadCsv,
     reset,
+
+    // Pagination
+    setPage,
 
     // Computed properties
     isExecuting: status === 'running',
