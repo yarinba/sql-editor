@@ -1,6 +1,5 @@
 import axios from 'axios';
-import {
-  ApiResponse,
+import type {
   GetTablesResponse,
   GetTableDetailsResponse,
   ExecuteQueryRequest,
@@ -21,20 +20,18 @@ const api = axios.create({
 export const schemaService = {
   // Get all tables
   getTables: async (): Promise<GetTablesResponse> => {
-    const response = await api.get<ApiResponse<GetTablesResponse>>(
-      '/schema/tables'
-    );
-    return response.data.data || [];
+    const response = await api.get<GetTablesResponse>('/schema/tables');
+    return response.data || [];
   },
 
   // Get table details with columns
   getTableDetails: async (
     tableName: string
   ): Promise<GetTableDetailsResponse> => {
-    const response = await api.get<ApiResponse<GetTableDetailsResponse>>(
+    const response = await api.get<GetTableDetailsResponse>(
       `/schema/tables/${tableName}`
     );
-    return response.data.data || { name: tableName, columns: [] };
+    return response.data || { name: tableName, columns: [] };
   },
 };
 
@@ -44,19 +41,17 @@ export const queryService = {
   executeQuery: async (
     request: ExecuteQueryRequest
   ): Promise<ExecuteQueryResponse> => {
-    const response = await api.post<ApiResponse<ExecuteQueryResponse>>(
+    const response = await api.post<ExecuteQueryResponse>(
       '/query/execute',
       request
     );
-    return response.data.data as ExecuteQueryResponse;
+    return response.data;
   },
 
   // Get query status
   getQueryStatus: async (queryId: string): Promise<QueryExecution> => {
-    const response = await api.get<ApiResponse<QueryExecution>>(
-      `/query/${queryId}/status`
-    );
-    return response.data.data as QueryExecution;
+    const response = await api.get<QueryExecution>(`/query/${queryId}/status`);
+    return response.data;
   },
 
   // Get query results
@@ -65,11 +60,11 @@ export const queryService = {
     page = 1,
     pageSize = 100
   ): Promise<GetQueryResultsResponse> => {
-    const response = await api.get<ApiResponse<GetQueryResultsResponse>>(
+    const response = await api.get<GetQueryResultsResponse>(
       `/query/${queryId}/results`,
       { params: { page, pageSize } }
     );
-    return response.data.data as GetQueryResultsResponse;
+    return response.data;
   },
 
   // Download query results as CSV
