@@ -1,48 +1,54 @@
-import NxWelcome from './nx-welcome';
-
-import { Route, Routes, Link } from 'react-router-dom';
+import { Allotment } from 'allotment';
+import { useState } from 'react';
+import Header from '../components/layout/Header';
+import SchemaExplorer from '../components/schema/SchemaExplorer';
+import SQLEditor from '../components/editor/SQLEditor';
+import ResultsTable from '../components/results/ResultsTable';
 
 export function App() {
-  return (
-    <div>
-      <NxWelcome title="fe" />
+  const [query, setQuery] = useState<string>('SELECT * FROM users LIMIT 10;');
+  const [isExecuting, setIsExecuting] = useState<boolean>(false);
 
-      {/* START: routes */}
-      {/* These routes and navigation have been generated for you */}
-      {/* Feel free to move and update them to fit your needs */}
-      <br />
-      <hr />
-      <br />
-      <div role="navigation">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
-        </ul>
+  const handleExecuteQuery = () => {
+    setIsExecuting(true);
+    // This will be replaced with actual API call logic
+    setTimeout(() => {
+      setIsExecuting(false);
+    }, 1000);
+  };
+
+  return (
+    <div className="flex flex-col h-screen">
+      <Header />
+
+      <div className="flex-1 overflow-hidden">
+        <Allotment vertical defaultSizes={[60, 40]}>
+          {/* Top section: Schema Explorer and SQL Editor */}
+          <Allotment.Pane>
+            <Allotment>
+              {/* Schema Explorer */}
+              <Allotment.Pane preferredSize={250} minSize={200}>
+                <SchemaExplorer />
+              </Allotment.Pane>
+
+              {/* SQL Editor */}
+              <Allotment.Pane minSize={400}>
+                <SQLEditor
+                  value={query}
+                  onChange={setQuery}
+                  onExecute={handleExecuteQuery}
+                  isExecuting={isExecuting}
+                />
+              </Allotment.Pane>
+            </Allotment>
+          </Allotment.Pane>
+
+          {/* Bottom section: Results Table */}
+          <Allotment.Pane minSize={150}>
+            <ResultsTable isLoading={isExecuting} />
+          </Allotment.Pane>
+        </Allotment>
       </div>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              This is the generated root route.{' '}
-              <Link to="/page-2">Click here for page 2.</Link>
-            </div>
-          }
-        />
-        <Route
-          path="/page-2"
-          element={
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          }
-        />
-      </Routes>
-      {/* END: routes */}
     </div>
   );
 }
