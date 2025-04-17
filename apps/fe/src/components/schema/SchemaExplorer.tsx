@@ -25,7 +25,7 @@ const SchemaExplorer: React.FC = () => {
 
   if (loading && tables.length === 0) {
     return (
-      <div className="flex flex-col h-full p-4 overflow-auto bg-slate-50">
+      <div className="flex flex-col h-full p-4 overflow-auto bg-white">
         <h2 className="text-lg font-semibold mb-4">Schema Explorer</h2>
         <div className="flex justify-center items-center h-40">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div>
@@ -36,7 +36,7 @@ const SchemaExplorer: React.FC = () => {
 
   if (error && tables.length === 0) {
     return (
-      <div className="flex flex-col h-full p-4 overflow-auto bg-slate-50">
+      <div className="flex flex-col h-full p-4 overflow-auto bg-white">
         <h2 className="text-lg font-semibold mb-4">Schema Explorer</h2>
         <div className="text-red-500 p-2">Error loading schema: {error}</div>
       </div>
@@ -44,8 +44,8 @@ const SchemaExplorer: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-auto bg-slate-50">
-      <div className="p-4 border-b border-slate-200">
+    <div className="flex flex-col h-full overflow-auto bg-white">
+      <div className="p-4 border-b border-gray-200">
         <h2 className="text-lg font-semibold">Schema Explorer</h2>
       </div>
 

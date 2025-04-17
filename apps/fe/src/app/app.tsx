@@ -2,7 +2,7 @@ import { Allotment } from 'allotment';
 import Header from '../components/layout/Header';
 import SchemaExplorer from '../components/schema/SchemaExplorer';
 import SQLEditor from '../components/editor/SQLEditor';
-import ResultsTable from '../components/results/ResultsTable';
+import ResultsSection from '../components/results/ResultsSection';
 
 export function App() {
   return (
@@ -28,7 +28,7 @@ export function App() {
 
           {/* Bottom section: Results Table */}
           <Allotment.Pane minSize={150}>
-            <ResultsTable />
+            <ResultsSection />
           </Allotment.Pane>
         </Allotment>
       </div>

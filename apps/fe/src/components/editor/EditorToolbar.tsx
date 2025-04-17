@@ -1,51 +1,50 @@
-import { Play, Save, Settings, WandSparkles } from 'lucide-react';
-
+import { Play, Save, WandSparkles, Settings, Loader } from 'lucide-react';
 import { useSqlQuery } from '../../hooks/useSqlQuery';
 
 const EditorToolbar: React.FC = () => {
   const { loading, executeQuery } = useSqlQuery();
 
   return (
-    <div className="border-b border-t border-slate-200 bg-slate-800 flex items-center p-1 gap-1">
-      {/* Execute Query (Green) */}
-      <button
-        onClick={() => executeQuery()}
-        disabled={loading}
-        className="p-1 text-green-500 hover:bg-slate-700 rounded-md transition focus:outline-none"
-        title="Run"
-      >
-        <Play size={16} />
-      </button>
+    <div className="flex items-center p-1 bg-gray-100 border-b border-gray-200">
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => executeQuery()}
+          disabled={loading}
+          className="flex items-center gap-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none"
+        >
+          {loading ? (
+            <Loader size={12} className="animate-spin" />
+          ) : (
+            <Play size={12} />
+          )}
+          <span className="text-xs font-medium">Run</span>
+        </button>
 
-      {/* Divider */}
-      <div className="h-4 w-px bg-slate-600"></div>
+        <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
 
-      {/* Save */}
-      <button
-        className="p-1 text-slate-300 hover:bg-slate-700 rounded-md transition focus:outline-none"
-        title="Save"
-      >
-        <Save size={16} />
-      </button>
+        <button
+          title="Save"
+          className="p-1 text-gray-600 hover:text-gray-900 rounded focus:outline-none"
+        >
+          <Save size={14} />
+        </button>
 
-      {/* Format */}
-      <button
-        className="p-1 text-slate-300 hover:bg-slate-700 rounded-md transition focus:outline-none"
-        title="Format"
-      >
-        <WandSparkles size={16} />
-      </button>
+        <button
+          title="Format"
+          className="p-1 text-gray-600 hover:text-gray-900 rounded focus:outline-none"
+        >
+          <WandSparkles size={14} />
+        </button>
 
-      {/* Divider */}
-      <div className="h-4 w-px bg-slate-600"></div>
+        <div className="w-px h-3 bg-gray-300 mx-0.5"></div>
 
-      {/* Settings */}
-      <button
-        className="p-1 text-slate-300 hover:bg-slate-700 rounded-md transition focus:outline-none"
-        title="Settings"
-      >
-        <Settings size={16} />
-      </button>
+        <button
+          title="Settings"
+          className="p-1 text-gray-600 hover:text-gray-900 rounded focus:outline-none"
+        >
+          <Settings size={14} />
+        </button>
+      </div>
     </div>
   );
 };

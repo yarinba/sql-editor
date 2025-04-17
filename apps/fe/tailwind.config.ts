@@ -11,7 +11,16 @@ export default {
     ...createGlobPatternsForDependencies(__dirname),
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Mulish', 'sans-serif'],
+      },
+      colors: {
+        app: {
+          header: '#1C1C21',
+        },
+      },
+    },
   },
   plugins: [],
 };
