@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useSchema } from '../../hooks/useSchema';
-import { Table, Column } from '@sql-editor/types';
+import TableList from './TableList';
+import TableDetails from './TableDetails';
 
 const SchemaExplorer: React.FC = () => {
   const { tables, selectedTable, tableDetails, loading, error, selectTable } =
@@ -10,7 +11,7 @@ const SchemaExplorer: React.FC = () => {
   >({});
 
   // Toggle expanded state for a table
-  const toggleTable = (tableName: string) => {
+  const handleToggleTable = (tableName: string) => {
     setExpandedTables((prev) => ({
       ...prev,
       [tableName]: !prev[tableName],
@@ -49,69 +50,36 @@ const SchemaExplorer: React.FC = () => {
       </div>
 
       <div className="p-2 flex-1 overflow-auto">
-        {tables.length === 0 ? (
-          <div className="text-slate-500 p-2">No tables found</div>
-        ) : (
-          <ul className="space-y-1">
-            {tables.map((table: Table) => (
-              <li key={table.name} className="select-none">
-                <div
-                  className={`
-                    flex items-center p-2 rounded cursor-pointer
-                    ${
-                      selectedTable === table.name
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'hover:bg-slate-100'
-                    }
-                  `}
-                  onClick={() => toggleTable(table.name)}
-                >
-                  <span className="mr-1">
-                    {expandedTables[table.name] ? '▼' : '▶'}
-                  </span>
-                  <span className="font-medium">{table.name}</span>
-                  {table.rowCount && (
-                    <span className="ml-2 text-xs text-slate-500">
-                      ({table.rowCount.toLocaleString()} rows)
-                    </span>
-                  )}
-                </div>
+        <TableList
+          tables={tables}
+          selectedTable={selectedTable}
+          expandedTables={expandedTables}
+          onToggleTable={handleToggleTable}
+          loading={loading}
+          error={error}
+        />
 
-                {/* Columns */}
-                {expandedTables[table.name] &&
-                  tableDetails &&
-                  tableDetails.name === table.name && (
-                    <ul className="pl-6 mt-1 space-y-1">
-                      {tableDetails.columns.map((column: Column) => (
-                        <li
-                          key={column.name}
-                          className="flex items-center p-1 text-sm"
-                        >
-                          <span className="text-slate-400 mr-2">-</span>
-                          <span className="font-mono">{column.name}</span>
-                          <span className="ml-2 text-xs text-slate-500">
-                            {column.type}
-                            {column.isPrimary && ' (PK)'}
-                            {column.nullable ? '' : ' (NOT NULL)'}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+        {/* Show table details for expanded tables */}
+        {Object.entries(expandedTables).map(([tableName, isExpanded]) => {
+          if (!isExpanded) return null;
 
-                {/* Loading indicator for table details */}
-                {expandedTables[table.name] &&
-                  loading &&
-                  (!tableDetails || tableDetails.name !== table.name) && (
-                    <div className="pl-6 py-2">
-                      <div className="animate-pulse h-4 bg-slate-200 rounded w-3/4"></div>
-                      <div className="animate-pulse h-4 bg-slate-200 rounded w-1/2 mt-1"></div>
-                    </div>
-                  )}
-              </li>
-            ))}
-          </ul>
-        )}
+          const isLoadingDetails =
+            loading && (!tableDetails || tableDetails.name !== tableName);
+
+          const showDetails = tableDetails && tableDetails.name === tableName;
+
+          return (
+            <div key={tableName}>
+              {showDetails && (
+                <TableDetails tableDetails={tableDetails} loading={false} />
+              )}
+
+              {isLoadingDetails && (
+                <TableDetails tableDetails={null} loading={true} />
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
