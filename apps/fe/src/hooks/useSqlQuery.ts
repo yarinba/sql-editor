@@ -3,7 +3,7 @@ import { useQueryStore } from '../store/query';
 /**
  * Custom hook for SQL query execution and results
  */
-export function useQuery() {
+export function useSqlQuery() {
   const {
     sql,
     execution,
@@ -13,7 +13,6 @@ export function useQuery() {
     error,
     setSql,
     executeQuery,
-    checkQueryStatus,
     fetchQueryResults,
     downloadCsv,
     reset,
@@ -40,7 +39,6 @@ export function useQuery() {
 
     // Query management
     setSql,
-    checkQueryStatus,
     fetchQueryResults,
     downloadCsv,
     reset,

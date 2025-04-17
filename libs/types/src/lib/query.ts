@@ -43,9 +43,6 @@ export interface QueryExecution {
   queryId: string;
   status: QueryStatus;
   startTime: string;
-  duration?: number;
-  progress?: number;
-  results?: QueryResults;
   error?: QueryError;
 }
 

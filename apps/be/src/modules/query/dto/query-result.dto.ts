@@ -24,11 +24,11 @@ import type {
 export class QueryColumnDto implements QueryColumn {
   @IsString()
   @Expose()
-  name!: string;
+  name: string;
 
   @IsString()
   @Expose()
-  type!: string;
+  type: string;
 }
 
 /**
@@ -38,7 +38,7 @@ export class QueryColumnDto implements QueryColumn {
 export class QueryErrorDto implements QueryError {
   @IsString()
   @Expose()
-  message!: string;
+  message: string;
 
   @IsNumber()
   @IsOptional()
@@ -60,19 +60,19 @@ export class QueryResultsDto implements QueryResults {
   @ValidateNested({ each: true })
   @Type(() => QueryColumnDto)
   @Expose()
-  columns!: QueryColumnDto[];
+  columns: QueryColumnDto[];
 
   @IsArray()
   @Expose()
-  rows!: any[][];
+  rows: any[][];
 
   @IsNumber()
   @Expose()
-  rowCount!: number;
+  rowCount: number;
 
   @IsBoolean()
   @Expose()
-  truncated!: boolean;
+  truncated: boolean;
 
   @IsNumber()
   @IsOptional()
@@ -92,22 +92,15 @@ export class QueryResultsDto implements QueryResults {
 export class QueryExecutionDto implements QueryExecution {
   @IsString()
   @Expose()
-  queryId!: string;
+  queryId: string;
 
   @IsString()
   @Expose()
-  status!: QueryStatus;
+  status: QueryStatus;
 
   @IsISO8601()
   @Expose()
-  startTime!: string;
-
-  @IsOptional()
-  @IsObject()
-  @ValidateNested()
-  @Type(() => QueryResultsDto)
-  @Expose()
-  results?: QueryResultsDto;
+  startTime: string;
 
   @IsOptional()
   @IsObject()
@@ -115,14 +108,4 @@ export class QueryExecutionDto implements QueryExecution {
   @Type(() => QueryErrorDto)
   @Expose()
   error?: QueryErrorDto;
-
-  @IsNumber()
-  @IsOptional()
-  @Expose()
-  duration?: number;
-
-  @IsNumber()
-  @IsOptional()
-  @Expose()
-  progress?: number;
 }

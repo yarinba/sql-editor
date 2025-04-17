@@ -104,21 +104,10 @@ export class QueryService {
       queryId: activeQuery.id,
       status: activeQuery.status,
       startTime: activeQuery.startTime.toISOString(),
-      duration: Date.now() - activeQuery.startTime.getTime(),
     };
 
     if (activeQuery.status === 'error' && activeQuery.error) {
       result.error = activeQuery.error;
-    }
-
-    if (activeQuery.status === 'completed' && activeQuery.results) {
-      // Don't include results here, just basic info
-      result.results = {
-        columns: activeQuery.results.columns,
-        rows: [],
-        rowCount: activeQuery.results.rowCount,
-        truncated: activeQuery.results.truncated,
-      };
     }
 
     return result;

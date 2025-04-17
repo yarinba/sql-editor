@@ -1,50 +1,28 @@
 import * as React from 'react';
 import Editor from '@monaco-editor/react';
-import { useQuery } from '../../hooks/useQuery';
+import { useSqlQuery } from '../../hooks/useSqlQuery';
 
-interface SQLEditorProps {
-  value: string;
-  onChange: (value: string) => void;
-  onExecute: () => void;
-  isExecuting: boolean;
-}
-
-const SQLEditor: React.FC<SQLEditorProps> = ({
-  value,
-  onChange,
-  onExecute,
-  isExecuting,
-}) => {
-  const { setSql, executeQuery } = useQuery();
-
-  // Set the value in the query store when it changes
-  React.useEffect(() => {
-    setSql(value);
-  }, [value, setSql]);
-
-  const handleExecute = React.useCallback(() => {
-    onExecute();
-    executeQuery();
-  }, [onExecute, executeQuery]);
+const SQLEditor: React.FC = () => {
+  const { sql, loading, setSql, executeQuery } = useSqlQuery();
 
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b border-slate-200 flex justify-between items-center">
         <h2 className="text-lg font-semibold">SQL Editor</h2>
         <button
-          onClick={handleExecute}
-          disabled={isExecuting}
+          onClick={() => executeQuery()}
+          disabled={loading}
           className={`
             px-4 py-2 rounded font-medium text-white
             ${
-              isExecuting
+              loading
                 ? 'bg-blue-400 cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
             }
             transition-colors duration-150
           `}
         >
-          {isExecuting ? (
+          {loading ? (
             <span className="flex items-center">
               <svg
                 className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
@@ -78,8 +56,8 @@ const SQLEditor: React.FC<SQLEditorProps> = ({
         <Editor
           height="100%"
           defaultLanguage="sql"
-          value={value}
-          onChange={(value) => onChange(value || '')}
+          value={sql}
+          onChange={(value) => setSql(value)}
           options={{
             minimap: { enabled: false },
             scrollBeyondLastLine: false,

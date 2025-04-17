@@ -8,7 +8,7 @@ import type { ExecuteQueryRequest } from '@sql-editor/types';
  */
 export class ExecuteQueryDto implements ExecuteQueryRequest {
   @IsString()
-  sql!: string;
+  sql: string;
 
   @IsOptional()
   @IsNumber()

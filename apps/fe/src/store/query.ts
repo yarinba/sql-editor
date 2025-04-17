@@ -17,7 +17,6 @@ interface QueryState {
 
   setSql: (sql: string) => void;
   executeQuery: (timeout?: number) => Promise<void>;
-  checkQueryStatus: (queryId: string) => Promise<void>;
   fetchQueryResults: (
     queryId: string,
     page?: number,
@@ -26,6 +25,21 @@ interface QueryState {
   downloadCsv: (queryId: string) => void;
   reset: () => void;
 }
+
+// Helper function to poll query status until it's no longer running
+const pollRunningQuery = async (
+  queryId: string,
+  pollInterval = 1000
+): Promise<QueryExecution> => {
+  const query = await queryService.getQueryStatus(queryId);
+
+  if (query.status !== 'running') {
+    return query;
+  }
+
+  await new Promise((resolve) => setTimeout(resolve, pollInterval));
+  return pollRunningQuery(queryId, pollInterval);
+};
 
 export const useQueryStore = create<QueryState>((set, get) => ({
   sql: '',
@@ -45,19 +59,22 @@ export const useQueryStore = create<QueryState>((set, get) => ({
         ...(timeout ? { timeout } : {}),
       };
 
-      const execution = await queryService.executeQuery(request);
-      set({ execution, loading: false, status: execution.status });
+      const runningExecution = await queryService.executeQuery(request);
+      set({ execution: runningExecution, status: runningExecution.status });
+
+      const finishedExecution = await pollRunningQuery(
+        runningExecution.queryId
+      );
+      set({ execution: finishedExecution, status: finishedExecution.status });
 
       // If query is completed, set the results
-      if (execution.status === 'completed' && execution.results) {
-        set({ results: execution.results });
+      if (finishedExecution.status === 'completed') {
+        // loading will state will be handled in fetchQueryResults
+        get().fetchQueryResults(finishedExecution.queryId);
       }
-
-      // If query is still running, poll for status
-      if (execution.status === 'running') {
-        setTimeout(() => {
-          get().checkQueryStatus(execution.queryId);
-        }, 1000);
+      if (finishedExecution.status === 'error') {
+        // error will be handled in catch block
+        throw new Error(finishedExecution.error?.message);
       }
     } catch (error) {
       console.error('Error executing query:', error);
@@ -66,34 +83,6 @@ export const useQueryStore = create<QueryState>((set, get) => ({
         status: 'error',
         error:
           error instanceof Error ? error.message : 'Failed to execute query',
-      });
-    }
-  },
-
-  checkQueryStatus: async (queryId: string) => {
-    try {
-      const execution = await queryService.getQueryStatus(queryId);
-      set({ execution, status: execution.status });
-
-      // If query is completed, fetch results
-      if (execution.status === 'completed') {
-        get().fetchQueryResults(queryId);
-      }
-
-      // If query is still running, continue polling
-      if (execution.status === 'running') {
-        setTimeout(() => {
-          get().checkQueryStatus(queryId);
-        }, 1000);
-      }
-    } catch (error) {
-      console.error('Error checking query status:', error);
-      set({
-        status: 'error',
-        error:
-          error instanceof Error
-            ? error.message
-            : 'Failed to check query status',
       });
     }
   },

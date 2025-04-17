@@ -6,15 +6,11 @@ import {
   useReactTable,
   ColumnDef,
 } from '@tanstack/react-table';
-import { useQuery } from '../../hooks/useQuery';
+import { useSqlQuery } from '../../hooks/useSqlQuery';
 import { QueryColumn } from '@sql-editor/types';
 
-interface ResultsTableProps {
-  isLoading: boolean;
-}
-
-const ResultsTable: React.FC<ResultsTableProps> = ({ isLoading }) => {
-  const { results, execution, error, status, setPage } = useQuery();
+const ResultsTable: React.FC = () => {
+  const { results, execution, loading, error, status, setPage } = useSqlQuery();
   const [columns, setColumns] = React.useState<ColumnDef<any, any>[]>([]);
 
   // Generate table columns when results change
@@ -57,7 +53,7 @@ const ResultsTable: React.FC<ResultsTableProps> = ({ isLoading }) => {
   });
 
   // Handle loading state
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex flex-col h-full">
         <div className="p-4 border-b border-slate-200">
