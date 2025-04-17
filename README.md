@@ -1,101 +1,140 @@
-# SqlEditor
+# SQL Editor Application
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A web application with functionality similar to Metabase's query editor for connecting to and exploring a PostgreSQL database. The application allows users to write SQL queries, browse database schema, and view query results in a clean, interactive interface.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Project Structure
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+This project is organized as a monorepo using Nx, with the following structure:
 
-## Run tasks
-
-To run the dev server for your app, use:
-
-```sh
-npx nx serve fe
+```
+/sql-editor
+  /apps
+    /be              # NestJS backend application
+    /fe              # React frontend application
+  /libs
+    /types           # Shared TypeScript types library
+  /infra             # Infrastructure configuration
+    /postgres        # PostgreSQL configuration
+      /init-db       # Database initialization scripts
 ```
 
-To create a production bundle:
+## Quick Start
 
-```sh
-npx nx build fe
+### Prerequisites
+
+- Docker and Docker Compose installed on your machine
+- Node.js and npm (for local development)
+
+### Starting the Database with Sample Data
+
+The quickest way to get started is using Docker Compose:
+
+```bash
+# Start PostgreSQL with sample data
+npm run infra:up
 ```
 
-To see all available targets to run for a project, run:
+This will:
 
-```sh
-npx nx show project fe
+- Start a PostgreSQL container on port 5432
+- Create and seed tables (users, products, orders) with 1,500 rows each
+- The seed data provides a comprehensive dataset for testing and development
+
+### PostgreSQL Database Connection Details
+
+- **Host**: localhost
+- **Port**: 5432 (default in docker-compose.yml)
+- **Username**: postgres
+- **Password**: postgres
+- **Database**: postgres
+- **Schema**: public
+
+### Sample Data Overview
+
+The database contains three main tables:
+
+1. **Users**
+
+   - Fields: id, name, email, active, last_login, created_at
+   - Includes a mix of predefined users and randomly generated data
+
+2. **Products**
+
+   - Fields: id, name, description, price, category, created_at
+   - Contains various product categories (Electronics, Accessories, Office, etc.)
+
+3. **Orders**
+   - Fields: id, user_id, order_date, amount, status
+   - Various statuses: pending, shipped, delivered, cancelled
+
+## Development Setup
+
+### Backend (NestJS)
+
+```bash
+# Navigate to backend directory
+cd apps/be
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run start:dev
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+**Note**: Update the database port in `apps/be/.env` to match 5432 if using the Docker setup.
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Frontend (React)
 
-## Add new projects
+```bash
+# Navigate to frontend directory
+cd apps/fe
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+# Install dependencies
+npm install
 
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
-
-```sh
-npx nx g @nx/react:app demo
+# Start development server
+npm run dev
 ```
 
-To generate a new library, use:
+### Full-Stack Development with Docker (When Implemented)
 
-```sh
-npx nx g @nx/react:lib mylib
+Uncomment the backend and frontend services in the `docker-compose.yml` file once they are implemented, then run:
+
+```bash
+docker-compose up
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+## Features
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- **Interactive SQL Editor**
 
-## Set up CI!
+  - Syntax highlighting
+  - Auto-completion based on schema
+  - Error highlighting
 
-### Step 1
+- **Schema Explorer**
 
-To connect to Nx Cloud, run the following command:
+  - Displays tables and columns in an expandable tree view
+  - Shows column types and metadata
 
-```sh
-npx nx connect
+- **Query Results**
+  - Interactive table with sortable columns
+  - Pagination for large result sets
+  - Export results as CSV
+
+## Database Management
+
+### Reset Data
+
+To completely reset the database (including removing volumes):
+
+```bash
+docker-compose down -v
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+Then start it again:
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
+```bash
+docker-compose up -d postgres
 ```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/react-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)

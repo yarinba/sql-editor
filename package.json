@@ -2,7 +2,9 @@
   "name": "@sql-editor/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "infra:up": "docker compose up -d"
+  },
   "private": true,
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
