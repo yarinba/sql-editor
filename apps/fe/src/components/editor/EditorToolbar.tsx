@@ -8,7 +8,7 @@ const EditorToolbar: React.FC = () => {
 
   // Determine the run query keyboard shortcut text based on platform
   const runShortcutText = useMemo(() => {
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const isMac = /(Mac)/i.test(navigator.userAgent);
     return isMac ? '⌘ + ⏎' : 'Ctrl + ⏎';
   }, []);
 
