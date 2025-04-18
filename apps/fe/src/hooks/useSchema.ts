@@ -7,13 +7,14 @@ import { useSchemaStore } from '../store/schema';
 export function useSchema() {
   const {
     tables,
-    selectedTable,
-    tableDetails,
-    loading,
+    expandedTables,
+    tableDetailsMap,
+    loadingTables,
+    loadingDetailsMap,
     error,
     fetchTables,
     fetchTableDetails,
-    selectTable,
+    toggleTableExpansion,
   } = useSchemaStore();
 
   // Load tables when hook is first used
@@ -24,14 +25,15 @@ export function useSchema() {
   return {
     // State
     tables,
-    selectedTable,
-    tableDetails,
-    loading,
+    expandedTables,
+    tableDetailsMap,
+    loadingTables,
+    loadingDetailsMap,
     error,
 
     // Actions
     fetchTables,
     fetchTableDetails,
-    selectTable,
+    toggleTableExpansion,
   };
 }

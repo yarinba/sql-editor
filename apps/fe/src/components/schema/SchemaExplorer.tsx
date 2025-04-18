@@ -1,85 +1,144 @@
 import * as React from 'react';
+import { Search, Database, ChevronRight, ChevronDown, X } from 'lucide-react';
 import { useSchema } from '../../hooks/useSchema';
-import TableList from './TableList';
+import { Table } from '@sql-editor/types';
 import TableDetails from './TableDetails';
 
 const SchemaExplorer: React.FC = () => {
-  const { tables, selectedTable, tableDetails, loading, error, selectTable } =
-    useSchema();
-  const [expandedTables, setExpandedTables] = React.useState<
-    Record<string, boolean>
-  >({});
+  const {
+    tables,
+    expandedTables,
+    tableDetailsMap,
+    loadingTables,
+    loadingDetailsMap,
+    error,
+    toggleTableExpansion,
+  } = useSchema();
 
-  // Toggle expanded state for a table
-  const handleToggleTable = (tableName: string) => {
-    setExpandedTables((prev) => ({
-      ...prev,
-      [tableName]: !prev[tableName],
-    }));
+  const [searchQuery, setSearchQuery] = React.useState('');
 
-    // Load table details when expanded
-    if (!expandedTables[tableName]) {
-      selectTable(tableName);
-    }
-  };
+  // Filter tables based on search query
+  const filteredTables = React.useMemo(() => {
+    if (!searchQuery.trim()) return tables;
 
-  if (loading && tables.length === 0) {
+    return tables.filter((table) =>
+      table.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [tables, searchQuery]);
+
+  // Render loading state
+  if (loadingTables && tables.length === 0) {
     return (
-      <div className="flex flex-col h-full p-4 overflow-auto bg-white">
-        <h2 className="text-lg font-semibold mb-4">Schema Explorer</h2>
+      <div className="flex flex-col h-full bg-slate-50/50">
+        <div className="px-3 py-2 border-b border-slate-200 bg-white">
+          <h2 className="text-sm font-medium text-slate-800">Schema</h2>
+        </div>
         <div className="flex justify-center items-center h-40">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div>
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-slate-800"></div>
         </div>
       </div>
     );
   }
 
+  // Render error state
   if (error && tables.length === 0) {
     return (
-      <div className="flex flex-col h-full p-4 overflow-auto bg-white">
-        <h2 className="text-lg font-semibold mb-4">Schema Explorer</h2>
-        <div className="text-red-500 p-2">Error loading schema: {error}</div>
+      <div className="flex flex-col h-full bg-slate-50/50">
+        <div className="px-3 py-2 border-b border-slate-200 bg-white">
+          <h2 className="text-sm font-medium text-slate-800">Schema</h2>
+        </div>
+        <div className="p-3 text-xs text-red-500">Error: {error}</div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full overflow-auto bg-white">
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold">Schema Explorer</h2>
+    <div className="flex flex-col h-full bg-slate-50/50">
+      <div className="px-3 py-2 border-b border-slate-200 bg-white flex items-center justify-between">
+        <h2 className="text-sm font-medium text-slate-800">Schema</h2>
+        <div className="text-xs text-slate-500">{tables.length} tables</div>
       </div>
 
-      <div className="p-2 flex-1 overflow-auto">
-        <TableList
-          tables={tables}
-          selectedTable={selectedTable}
-          expandedTables={expandedTables}
-          onToggleTable={handleToggleTable}
-          loading={loading}
-          error={error}
-        />
+      {/* Search box */}
+      <div className="px-3 py-2 border-b border-slate-200">
+        <div className="relative">
+          <input
+            type="text"
+            className="w-full px-2 py-1.5 pl-7 text-xs bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Search tables..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-slate-400" />
+          {searchQuery && (
+            <button
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              onClick={() => setSearchQuery('')}
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+      </div>
 
-        {/* Show table details for expanded tables */}
-        {Object.entries(expandedTables).map(([tableName, isExpanded]) => {
-          if (!isExpanded) return null;
+      {/* Tree View */}
+      <div className="overflow-auto flex-1 text-sm">
+        {filteredTables.length === 0 ? (
+          <div className="p-3 text-center text-xs text-slate-500">
+            No tables found{searchQuery ? ` matching "${searchQuery}"` : ''}
+          </div>
+        ) : (
+          <div className="py-1">
+            {filteredTables.map((table: Table) => {
+              const isExpanded = expandedTables.has(table.name);
+              const isLoading = loadingDetailsMap[table.name];
+              const tableDetails = tableDetailsMap[table.name];
 
-          const isLoadingDetails =
-            loading && (!tableDetails || tableDetails.name !== tableName);
+              return (
+                <div key={table.name} className="select-none">
+                  {/* Table header */}
+                  <button
+                    onClick={() => toggleTableExpansion(table.name)}
+                    className="flex items-center w-full px-3 py-1 text-left hover:bg-slate-100 focus:outline-none focus:bg-slate-100 text-xs font-mono"
+                  >
+                    <span className="mr-1 opacity-70">
+                      {isExpanded ? (
+                        <ChevronDown className="h-3 w-3" />
+                      ) : (
+                        <ChevronRight className="h-3 w-3" />
+                      )}
+                    </span>
+                    <Database className="h-3 w-3 mr-2 text-blue-500/70" />
+                    <span className="font-medium">{table.name}</span>
+                    {table.rowCount && (
+                      <span className="ml-2 text-xxs opacity-50 tabular-nums">
+                        {table.rowCount.toLocaleString()} rows
+                      </span>
+                    )}
+                  </button>
 
-          const showDetails = tableDetails && tableDetails.name === tableName;
+                  {/* Table details */}
+                  {isExpanded && (
+                    <div className="bg-white border-y border-slate-100">
+                      <TableDetails
+                        tableDetails={tableDetails}
+                        loading={isLoading || false}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
-          return (
-            <div key={tableName}>
-              {showDetails && (
-                <TableDetails tableDetails={tableDetails} loading={false} />
-              )}
-
-              {isLoadingDetails && (
-                <TableDetails tableDetails={null} loading={true} />
-              )}
-            </div>
-          );
-        })}
+      {/* Status bar */}
+      <div className="px-3 py-1 border-t border-slate-200 bg-white text-xxs text-slate-500 flex justify-between items-center">
+        <span>Database Schema</span>
+        <span className="tabular-nums">
+          {filteredTables.length} of {tables.length}
+        </span>
       </div>
     </div>
   );

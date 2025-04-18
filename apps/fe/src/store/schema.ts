@@ -4,31 +4,33 @@ import { schemaService } from '../services/api';
 
 interface SchemaState {
   tables: Table[];
-  selectedTable: string | null;
-  tableDetails: TableDetails | null;
-  loading: boolean;
+  expandedTables: Set<string>;
+  tableDetailsMap: Record<string, TableDetails | null>;
+  loadingTables: boolean;
+  loadingDetailsMap: Record<string, boolean>;
   error: string | null;
   fetchTables: () => Promise<void>;
   fetchTableDetails: (tableName: string) => Promise<void>;
-  selectTable: (tableName: string) => void;
+  toggleTableExpansion: (tableName: string) => void;
 }
 
 export const useSchemaStore = create<SchemaState>((set, get) => ({
   tables: [],
-  selectedTable: null,
-  tableDetails: null,
-  loading: false,
+  expandedTables: new Set<string>(),
+  tableDetailsMap: {},
+  loadingTables: false,
+  loadingDetailsMap: {},
   error: null,
 
   fetchTables: async () => {
-    set({ loading: true, error: null });
+    set({ loadingTables: true, error: null });
     try {
       const tables = await schemaService.getTables();
-      set({ tables, loading: false });
+      set({ tables, loadingTables: false });
     } catch (error) {
       console.error('Error fetching tables:', error);
       set({
-        loading: false,
+        loadingTables: false,
         error:
           error instanceof Error ? error.message : 'Failed to fetch tables',
       });
@@ -36,24 +38,57 @@ export const useSchemaStore = create<SchemaState>((set, get) => ({
   },
 
   fetchTableDetails: async (tableName: string) => {
-    set({ loading: true, error: null });
+    // Set loading state for this specific table
+    set((state) => ({
+      loadingDetailsMap: {
+        ...state.loadingDetailsMap,
+        [tableName]: true,
+      },
+    }));
+
     try {
       const tableDetails = await schemaService.getTableDetails(tableName);
-      set({ tableDetails, loading: false });
+      set((state) => ({
+        tableDetailsMap: {
+          ...state.tableDetailsMap,
+          [tableName]: tableDetails,
+        },
+        loadingDetailsMap: {
+          ...state.loadingDetailsMap,
+          [tableName]: false,
+        },
+      }));
     } catch (error) {
       console.error(`Error fetching table details for ${tableName}:`, error);
-      set({
-        loading: false,
+      set((state) => ({
+        loadingDetailsMap: {
+          ...state.loadingDetailsMap,
+          [tableName]: false,
+        },
         error:
           error instanceof Error
             ? error.message
             : `Failed to fetch details for ${tableName}`,
-      });
+      }));
     }
   },
 
-  selectTable: (tableName: string) => {
-    set({ selectedTable: tableName });
-    get().fetchTableDetails(tableName);
+  toggleTableExpansion: (tableName: string) => {
+    // Update expanded tables set
+    set((state) => {
+      const newExpandedTables = new Set(state.expandedTables);
+
+      if (newExpandedTables.has(tableName)) {
+        newExpandedTables.delete(tableName);
+      } else {
+        newExpandedTables.add(tableName);
+        // Fetch details if this is the first time expanding or if we don't have details yet
+        if (!state.tableDetailsMap[tableName]) {
+          get().fetchTableDetails(tableName);
+        }
+      }
+
+      return { expandedTables: newExpandedTables };
+    });
   },
 }));

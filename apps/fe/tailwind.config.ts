@@ -20,6 +20,9 @@ export default {
           header: '#1C1C21',
         },
       },
+      fontSize: {
+        xxs: ['0.625rem', { lineHeight: '0.75rem' }],
+      },
     },
   },
   plugins: [],
