@@ -112,7 +112,7 @@ const SchemaExplorer: React.FC = () => {
                       <Database className="h-3 w-3 mr-2 text-blue-500/70" />
                     </span>
                     <span className="font-medium">{table.name}</span>
-                    {table.rowCount && (
+                    {table.rowCount > 0 && (
                       <span className="whitespace-nowrap ml-2 text-xxs opacity-50 tabular-nums">
                         {table.rowCount.toLocaleString()} rows
                       </span>

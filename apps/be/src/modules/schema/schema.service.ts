@@ -42,9 +42,10 @@ export class SchemaService {
       SELECT 
         t.table_name as name,
         obj_description(pgc.oid, 'pg_class') as description,
-        (SELECT reltuples::bigint FROM pg_class WHERE oid = pgc.oid) as row_count
+        pg_stat_user_tables.n_live_tup as row_count
       FROM information_schema.tables t
       JOIN pg_catalog.pg_class pgc ON pgc.relname = t.table_name
+      JOIN pg_stat_user_tables ON pg_stat_user_tables.relname = t.table_name
       WHERE t.table_schema = $1
         AND t.table_type = 'BASE TABLE'
       ORDER BY t.table_name
