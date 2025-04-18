@@ -89,7 +89,7 @@ const TableDetails: React.FC<TableDetailsProps> = ({
                   )}
                   {column.nullable === false && !column.isPrimary && (
                     <span className="text-xxs px-1 py-0.5 rounded-sm bg-slate-100 text-slate-500 font-normal">
-                      req
+                      required
                     </span>
                   )}
                 </div>

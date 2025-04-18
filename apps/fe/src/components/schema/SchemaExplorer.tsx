@@ -108,10 +108,12 @@ const SchemaExplorer: React.FC = () => {
                         <ChevronRight className="h-3 w-3" />
                       )}
                     </span>
-                    <Database className="h-3 w-3 mr-2 text-blue-500/70" />
+                    <span className="flex items-center">
+                      <Database className="h-3 w-3 mr-2 text-blue-500/70" />
+                    </span>
                     <span className="font-medium">{table.name}</span>
                     {table.rowCount && (
-                      <span className="ml-2 text-xxs opacity-50 tabular-nums">
+                      <span className="whitespace-nowrap ml-2 text-xxs opacity-50 tabular-nums">
                         {table.rowCount.toLocaleString()} rows
                       </span>
                     )}
