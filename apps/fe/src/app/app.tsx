@@ -10,25 +10,25 @@ export function App() {
       <Header />
 
       <div className="flex-1 overflow-hidden">
-        <Allotment vertical defaultSizes={[60, 40]}>
-          {/* Top section: Schema Explorer and SQL Editor */}
-          <Allotment.Pane>
-            <Allotment>
-              {/* Schema Explorer */}
-              <Allotment.Pane preferredSize={250} minSize={200}>
-                <SchemaExplorer />
-              </Allotment.Pane>
-
-              {/* SQL Editor */}
-              <Allotment.Pane minSize={400}>
-                <SQLEditor />
-              </Allotment.Pane>
-            </Allotment>
+        <Allotment>
+          {/* Left section: Schema Explorer (full height) */}
+          <Allotment.Pane preferredSize={250} minSize={200}>
+            <SchemaExplorer />
           </Allotment.Pane>
 
-          {/* Bottom section: Results Table */}
-          <Allotment.Pane minSize={150}>
-            <ResultsSection />
+          {/* Right section: SQL Editor and Results Table */}
+          <Allotment.Pane minSize={400}>
+            <Allotment vertical defaultSizes={[60, 40]}>
+              {/* SQL Editor */}
+              <Allotment.Pane minSize={150}>
+                <SQLEditor />
+              </Allotment.Pane>
+
+              {/* Results Table */}
+              <Allotment.Pane minSize={150}>
+                <ResultsSection />
+              </Allotment.Pane>
+            </Allotment>
           </Allotment.Pane>
         </Allotment>
       </div>
