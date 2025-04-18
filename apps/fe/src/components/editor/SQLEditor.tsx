@@ -4,7 +4,18 @@ import { useSqlQuery } from '../../hooks/useSqlQuery';
 import EditorToolbar from './EditorToolbar';
 
 const SQLEditor: React.FC = () => {
-  const { sql, setSql } = useSqlQuery();
+  const { sql, setSql, executeQuery } = useSqlQuery();
+
+  // Function to handle keyboard shortcuts
+  const handleEditorKeyDown = (editor: any, monaco: any) => {
+    editor.addCommand(
+      // Monaco uses KeyMod.CtrlCmd which automatically uses Command on Mac and Control on Windows/Linux
+      monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+      () => {
+        executeQuery();
+      }
+    );
+  };
 
   return (
     <div className="flex flex-col h-full bg-white">
@@ -16,6 +27,7 @@ const SQLEditor: React.FC = () => {
           defaultLanguage="sql"
           value={sql}
           onChange={(value) => setSql(value)}
+          onMount={handleEditorKeyDown}
           options={{
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
