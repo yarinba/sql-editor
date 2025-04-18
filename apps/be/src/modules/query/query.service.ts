@@ -247,7 +247,10 @@ export class QueryService {
 
     // Simple check - we might want to use a proper SQL parser for production
     for (const keyword of mutatingKeywords) {
-      if (sql.startsWith(keyword) || sql.includes(`;${keyword}`)) {
+      if (
+        sql.toLowerCase().startsWith(keyword) ||
+        sql.toLowerCase().includes(`;${keyword}`)
+      ) {
         return true;
       }
     }
